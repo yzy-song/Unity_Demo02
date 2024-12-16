@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package GameProtos; // 添加命名空间，避免与现有类冲突
+
+message PlayerProto {
+    string username = 1;
+    float x = 2; // 玩家x坐标
+    float y = 3; // 玩家y坐标
+    int32 lv = 4; // 玩家等级
+    int32 exp = 5; // 玩家经验
+    float hp = 6; // 玩家血量
+}
+
+message PlayerStateUpdate {
+    PlayerProto player = 1; // 使用修改后的消息名
+    string event_type = 2;  // 事件类型，例如 "update", "attack"
+}
+
+message PlayersState {
+    repeated PlayerProto players = 1; // 使用修改后的消息名
+}

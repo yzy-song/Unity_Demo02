@@ -1,0 +1,63 @@
+# =============== #
+# Unity Generated #
+# =============== #
+/[Ll]ibrary/
+[Ll]ogs/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/UserSettings/
+*/.vs/
+
+# Avoid uploading auto-generated project files
+# Keeps the .csproj/.sln files that are essential for editing in Visual Studio/Rider
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.pidb
+*.booproj
+*.svd
+
+# =============== #
+# Unity Metadata  #
+# =============== #
+*.userprefs
+*.pidb.meta
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# ============= #
+# OSX Generated #
+# ============= #
+.DS_Store
+.DS_Store?
+
+# ==================== #
+# Windows Generated    #
+# ==================== #
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ================== #
+# Visual Studio Code #
+# ================== #
+.vscode/
+
+# ==================== #
+# Rider Project Files  #
+# ==================== #
+.idea/
+*.iml
+
+# ============== #
+# Generated Files #
+# =============== #
+/[Bb]uild/
+/[Bb]uilds/
+/[Pp]latforms/

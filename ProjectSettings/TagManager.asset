@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Pickable
+  - Enemy
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Env_BG
+    uniqueID: 2008658309
+    locked: 0
+  - name: Env_Ground_Bottom
+    uniqueID: 3313785487
+    locked: 0
+  - name: Env_Ground_Top
+    uniqueID: 432304371
+    locked: 0
+  - name: Env_Ground_Build
+    uniqueID: 1436001707
+    locked: 0
+  - name: Interactable
+    uniqueID: 998058411
+    locked: 0
+  - name: Game
+    uniqueID: 3102697443
+    locked: 0
