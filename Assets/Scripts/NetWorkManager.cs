@@ -43,8 +43,8 @@ public class NetworkManager : MonoBehaviour
     }
 
     private ClientWebSocket ws;
-    // private const string serverUrl = "ws://127.0.0.1:5000";
-    private const string serverUrl = "ws://192.168.125.157:5000";
+    private const string serverUrl = "ws://127.0.0.1:5000";
+    // private const string serverUrl = "ws://192.168.125.157:5000";
 
     private CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
