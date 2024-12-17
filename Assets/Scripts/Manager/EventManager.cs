@@ -31,7 +31,6 @@ public static class EventManager
     {
         if (eventDictionary.ContainsKey(eventName))
         {
-            // Debug.Log($"Event triggered: {eventName}");
             (eventDictionary[eventName] as Action<T>)?.Invoke(eventData);
         }
         else

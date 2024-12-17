@@ -22,8 +22,6 @@ public class LoginManager : MonoBehaviour
 
     public Button testButton;
     public Button testButton2;
-    private float test1 = 100f;
-    private float test2 = 100f;
     private void OnTest()
     {
         iptUserName.text = "player1";

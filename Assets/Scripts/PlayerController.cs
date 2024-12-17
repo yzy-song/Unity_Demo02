@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using GameProtos;
+using Google.Protobuf;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -112,7 +113,7 @@ public class PlayerController : MonoBehaviour
         {
             lastSyncTime = Time.time;
 
-            // 构建状态更新并发送，仅同步当前玩家的状态
+            // 构建玩家状态更新消息
             PlayerStateUpdate update = new PlayerStateUpdate
             {
                 Player = new PlayerProto
@@ -123,12 +124,19 @@ public class PlayerController : MonoBehaviour
                     Lv = player.lv,
                     Exp = player.exp,
                     Hp = currentHealth
-                },
-                EventType = "update"
+                }
+            };
+
+            // 使用 BaseMessage 进行封装
+            BaseMessage baseMessage = new BaseMessage
+            {
+                EventType = "PlayerStateUpdate", // 事件类型
+                Payload = Google.Protobuf.ByteString.CopyFrom(update.ToByteArray()) // 序列化 PlayerStateUpdate
             };
 
             // 发送状态到服务器
-            NetworkManager.Instance.SendPlayerUpdate(update);
+            byte[] buffer = baseMessage.ToByteArray();
+            NetworkManager.Instance.SendBaseMessage(baseMessage);
 
             // 更新最后的位置
             lastPosition = currentPosition;
@@ -162,6 +170,7 @@ public class PlayerController : MonoBehaviour
         if (collision.tag == "Pickable")
         {
             collision.gameObject.SetActive(false);
+            // NetworkManager.Instance.SendItemPickup(itemId);
         }
     }
 

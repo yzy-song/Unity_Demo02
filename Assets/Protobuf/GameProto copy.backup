@@ -2,27 +2,24 @@ syntax = "proto3";
 
 package GameProtos; // 添加命名空间，避免与现有类冲突
 
-// 玩家数据结构
 message PlayerProto {
     string username = 1;
-    float x = 2;        // 玩家x坐标
-    float y = 3;        // 玩家y坐标
-    int32 lv = 4;       // 玩家等级
-    int32 exp = 5;      // 玩家经验
-    float hp = 6;       // 玩家血量
+    float x = 2; // 玩家x坐标
+    float y = 3; // 玩家y坐标
+    int32 lv = 4; // 玩家等级
+    int32 exp = 5; // 玩家经验
+    float hp = 6; // 玩家血量
 }
 
-// 玩家状态更新
 message PlayerStateUpdate {
-    PlayerProto player = 1; // 玩家数据
+    PlayerProto player = 1; // 使用修改后的消息名
+    string event_type = 2;  // 事件类型，例如 "update", "attack"
 }
 
-// 所有玩家状态
 message PlayersState {
-    repeated PlayerProto players = 1; // 所有玩家状态列表
+    repeated PlayerProto players = 1; // 使用修改后的消息名
 }
 
-// 道具数据结构
 message ItemProto {
     string id = 1;        // 道具唯一标识符
     string name = 2;      // 道具名称
@@ -31,7 +28,7 @@ message ItemProto {
     bool isPickedUp = 5;  // 是否被拾取
 }
 
-// 道具拾取事件
+
 message ItemPickupEvent {
     string playerId = 1; // 拾取道具的玩家 ID
     string itemId = 2;   // 被拾取的道具 ID
@@ -45,8 +42,7 @@ message ChatMessage {
     int64 timestamp = 4;    // 时间戳
 }
 
-// 基础消息结构，用于封装不同的事件
-message BaseMessage {
-    string event_type = 1;  // 事件类型，例如 "PlayerStateUpdate", "ItemPickup", "ChatMessage"
-    bytes payload = 2;      // 实际消息数据（序列化的其他消息）
+// 聊天广播消息
+message ChatBroadcast {
+    repeated ChatMessage messages = 1; // 广播的聊天消息列表
 }

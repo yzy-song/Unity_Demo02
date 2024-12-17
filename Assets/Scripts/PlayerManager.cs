@@ -19,6 +19,8 @@ public class PlayerManager : MonoBehaviour
     public Transform playerParent;
     public static Player CurrentPlayer { get; private set; }
     public Dictionary<string, GameObject> otherPlayers = new Dictionary<string, GameObject>();
+    private Dictionary<string, GameObject> items = new Dictionary<string, GameObject>();
+
     public static PlayerManager Instance { get; private set; }
 
     private void Awake()
@@ -29,7 +31,7 @@ public class PlayerManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        // DontDestroyOnLoad(gameObject);
     }
     private void Start()
     {
@@ -37,6 +39,8 @@ public class PlayerManager : MonoBehaviour
         // 登录成功后获取其他在线玩家数据
         StartCoroutine(OnlinePlayers());
 
+        EventManager.Subscribe<ItemProto>("ItemPickup", HandleItemPickup);
+        EventManager.Subscribe<ChatMessage>("ChatMessage", DisplayChatMessage);
         // string[] args = Environment.GetCommandLineArgs();
         // foreach (var arg in args)
         // {
@@ -47,6 +51,25 @@ public class PlayerManager : MonoBehaviour
         //         Debug.Log($"Username set to: {username}");
         //     }
         // }
+    }
+
+    private void HandleItemPickup(ItemProto itemProto)
+    {
+        if (items.ContainsKey(itemProto.Id))
+        {
+            Destroy(items[itemProto.Id]);
+            items.Remove(itemProto.Id);
+            Debug.Log($"Item {itemProto.Id} picked up.");
+        }
+    }
+
+    private void DisplayChatMessage(ChatMessage message)
+    {
+        string chatContent = string.IsNullOrEmpty(message.Receiver)
+            ? $"{message.Sender}: {message.Content}"
+            : $"[私聊] {message.Sender} -> {message.Receiver}: {message.Content}";
+
+        Debug.Log(chatContent); // 可扩展为 UI 显示
     }
 
     private void OnEnable()
@@ -117,6 +140,7 @@ public class PlayerManager : MonoBehaviour
             form,
             onSuccess: (response) =>
             {
+                NetworkManager.Instance.CloseWebSocket();
                 PlayerPrefs.DeleteKey("Username");
                 HideAllPlayers();
                 CurrentPlayer = null;
@@ -235,7 +259,7 @@ public class PlayerManager : MonoBehaviour
 
         if (syncProto.Username == CurrentPlayer.username)
         {
-            // // 当前玩家的同步逻辑交给 PlayerController 处理
+            // 当前玩家的同步逻辑交给 PlayerController 处理
             // var pc = CurrentPlayer.GetComponent<PlayerController>();
             // if (pc != null)
             // {
@@ -252,6 +276,11 @@ public class PlayerManager : MonoBehaviour
                 if (pc != null)
                 {
                     pc.UpdateOtherPlayer(syncProto);
+                    Debug.Log("Updated player " + usernameKey);
+                }
+                else
+                {
+                    Debug.Log("PlayerController not found for username: " + usernameKey);
                 }
             }
             else

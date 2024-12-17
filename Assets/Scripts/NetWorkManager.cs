@@ -79,17 +79,77 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    // private void HandleMessage(byte[] buffer, int count)
+    // {
+    //     var playersState = PlayersState.Parser.ParseFrom(buffer, 0, count);
+    //     foreach (var player in playersState.Players)
+    //     {
+    //         if (player.Username != PlayerManager.CurrentPlayer.username)
+    //         {
+    //             Debug.Log($"Received player sync: {player.Username}, Position: ({player.X}, {player.Y})");
+
+    //             EventManager.Invoke("PlayerSync", player);
+    //         }
+    //     }
+    // }
+
     private void HandleMessage(byte[] buffer, int count)
     {
-        var playersState = PlayersState.Parser.ParseFrom(buffer, 0, count);
-        foreach (var player in playersState.Players)
-        {
-            if (player.Username != PlayerManager.CurrentPlayer.username)
-            {
-                Debug.Log($"Received player sync: {player.Username}, Position: ({player.X}, {player.Y})");
+        // 解析 BaseMessage
+        var baseMessage = BaseMessage.Parser.ParseFrom(buffer, 0, count);
 
-                EventManager.Invoke("PlayerSync", player);
-            }
+        Debug.Log($"Event Type: {baseMessage.EventType}");
+        Debug.Log($"Payload length: {baseMessage.Payload.Length}");
+        // 根据事件类型解析不同的消息内容
+        switch (baseMessage.EventType)
+        {
+            case "PlayerStateUpdate":
+                var playerStateUpdate = PlayerStateUpdate.Parser.ParseFrom(baseMessage.Payload);
+                var player = playerStateUpdate.Player;
+
+                if (player.Username != PlayerManager.CurrentPlayer.username)
+                {
+                    Debug.Log($"Received player sync: {player.Username}, Position: ({player.X}, {player.Y})");
+                    EventManager.Invoke("PlayerSync", player);
+                }
+                break;
+
+            case "ItemPickup":
+                var itemPickup = ItemPickupEvent.Parser.ParseFrom(baseMessage.Payload);
+                Debug.Log($"Item picked up: {itemPickup.ItemId} by Player {itemPickup.PlayerId}");
+                EventManager.Invoke("ItemPickup", itemPickup);
+                break;
+
+            case "ChatMessage":
+                var chatMessage = ChatMessage.Parser.ParseFrom(baseMessage.Payload);
+                Debug.Log($"Chat Message from {chatMessage.Sender}: {chatMessage.Content}");
+                EventManager.Invoke("ChatMessage", chatMessage);
+                break;
+
+            default:
+                Debug.LogWarning($"Unknown event type: {baseMessage.EventType}");
+                break;
+        }
+    }
+
+
+    public void SendBaseMessage(BaseMessage message)
+    {
+        if (ws != null && ws.State == WebSocketState.Open)
+        {
+            byte[] buffer = message.ToByteArray(); // 序列化 BaseMessage
+            ws.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Binary, true, cancellationToken.Token)
+              .ContinueWith(task =>
+              {
+                  if (task.IsFaulted)
+                  {
+                      Debug.LogError("Failed to send BaseMessage: " + task.Exception.Message);
+                  }
+              });
+        }
+        else
+        {
+            Debug.LogError("WebSocket is not open. State: " + ws?.State);
         }
     }
 
@@ -116,6 +176,27 @@ public class NetworkManager : MonoBehaviour
         {
             Debug.LogError("WebSocket is not open. State: " + ws?.State);
         }
+    }
+
+    public void SendItemPickup(string itemId)
+    {
+        ItemProto itemProto = new ItemProto { Id = itemId };
+        byte[] data = itemProto.ToByteArray();
+        ws.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, cancellationToken.Token);
+    }
+
+    public void SendChatMessage(string receiver, string content)
+    {
+        ChatMessage chatMessage = new ChatMessage
+        {
+            Sender = PlayerManager.CurrentPlayer.username,
+            Receiver = receiver,
+            Content = content,
+            Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+        };
+
+        byte[] data = chatMessage.ToByteArray();
+        ws.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, cancellationToken.Token);
     }
 
 
