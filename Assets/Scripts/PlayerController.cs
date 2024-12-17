@@ -19,10 +19,10 @@ public class PlayerController : MonoBehaviour
     public bool useJoystick = true;
     public Joystick joystick;
 
-    [Header("Health Bar")]
-    public GameObject healthBarPrefab;  // 血条预制体
-    public Transform uiParent;         // 血条挂载的父节点（Canvas）
-    public Camera mainCamera;          // 主摄像机
+    // [Header("Health Bar")]
+    // public GameObject healthBarPrefab;  // 血条预制体
+    // public Transform uiParent;         // 血条挂载的父节点（Canvas）
+    // public Camera mainCamera;          // 主摄像机
 
     private GameObject healthBarInstance;
     private Image healthFillImage;
@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
     private float currentHealth;       // 当前血量
     public float attackRange = 0.6f;
 
-    private float highFrequencyInterval = 0.05f; // 同步间隔（移动时,50ms）
+    private float highFrequencyInterval = 0.5f; // 同步间隔（移动时,50ms）
     private float lowFrequencyInterval = 0.5f;  // 同步间隔（静止时,500ms）
     private float lastSyncTime = 0;
     private Vector2 lastPosition = Vector2.zero;
@@ -62,12 +62,11 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        // 初始化血条
-        if (healthBarPrefab == null || mainCamera == null)
-            return;
-        player = PlayerManager.CurrentPlayer;
-        lastPosition = player.position;
-        InitializeHealthBar();
+        if (PlayerManager.currentPlayer != null)
+        {
+            player = PlayerManager.currentPlayer;
+            lastPosition = player.position;
+        }
     }
 
 
@@ -98,10 +97,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (player.username == "player2")
-        {
-            transform.position += new Vector3(0.2f, 0, 0) * Time.deltaTime;
-        }
         // 动态判断当前玩家是否移动
         Vector2 currentPosition = transform.position;
         isMoving = currentPosition != lastPosition;
@@ -127,7 +122,8 @@ public class PlayerController : MonoBehaviour
                 }
             };
 
-            // 使用 BaseMessage 进行封装
+            Debug.Log($"Updated Player Status: name={player.username}, x={transform.position.x}, y={transform.position.x}");
+
             BaseMessage baseMessage = new BaseMessage
             {
                 EventType = "PlayerStateUpdate", // 事件类型
@@ -180,17 +176,9 @@ public class PlayerController : MonoBehaviour
     }
 
     // 初始化血条
-    private void InitializeHealthBar()
+    public void InitializeHealthBar()
     {
-        if (healthBarPrefab == null || uiParent == null || mainCamera == null)
-        {
-            Debug.LogError("HealthBarPrefab, UIParent, or MainCamera is not assigned!");
-            return;
-        }
-        var healthBar = gameObject.AddComponent<HealthBar>();
-        healthBar.healthBarPrefab = healthBarPrefab;
-        healthBar.uiParent = uiParent;
-        healthBar.mainCamera = mainCamera;
+        var healthBar = gameObject.GetComponent<HealthBar>();
         healthBar.Initialize(gameObject.transform, player.username, 100);
 
     }
@@ -250,7 +238,32 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Updated Player Status: Level={level}, Exp={experience}, HP={health}");
     }
 
+    public void OnAction()
+    {
+        PlayerStateUpdate update = new PlayerStateUpdate
+        {
+            Player = new PlayerProto
+            {
+                Username = player.username,
+                X = transform.position.x,
+                Y = transform.position.y,
+                Lv = player.lv,
+                Exp = player.exp,
+                Hp = currentHealth
+            }
+        };
 
+        Debug.Log($"Updated Player Status: name={player.username}, x={transform.position.x}, y={transform.position.x}");
+
+        BaseMessage baseMessage = new BaseMessage
+        {
+            EventType = "PlayerStateUpdate", // 事件类型
+            Payload = ByteString.CopyFrom(update.ToByteArray()) // 序列化 PlayerStateUpdate
+        };
+
+        // 发送状态到服务器
+        NetworkManager.Instance.SendBaseMessage(baseMessage);
+    }
     // 调试
     private void OnDrawGizmosSelected()
     {

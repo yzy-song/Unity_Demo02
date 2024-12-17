@@ -17,8 +17,9 @@ public class PlayerManager : MonoBehaviour
     public Camera mainCamera;
     public GameObject playerPrefab;
     public Transform playerParent;
-    public static Player CurrentPlayer { get; private set; }
-    public Dictionary<string, GameObject> otherPlayers = new Dictionary<string, GameObject>();
+    public PlayerController pc;
+    public static Player currentPlayer { get; private set; }
+    public Dictionary<string, GameObject> onlinePlayers = new Dictionary<string, GameObject>();
     private Dictionary<string, GameObject> items = new Dictionary<string, GameObject>();
 
     public static PlayerManager Instance { get; private set; }
@@ -41,13 +42,14 @@ public class PlayerManager : MonoBehaviour
 
         EventManager.Subscribe<ItemProto>("ItemPickup", HandleItemPickup);
         EventManager.Subscribe<ChatMessage>("ChatMessage", DisplayChatMessage);
+        EventManager.Subscribe<PlayerProto>("PlayerSync", OnPlayerSync);
         // string[] args = Environment.GetCommandLineArgs();
         // foreach (var arg in args)
         // {
         //     if (arg.StartsWith("-username="))
         //     {
         //         string username = arg.Split('=')[1];
-        //         PlayerManager.CurrentPlayer.username = username;
+        //         PlayerManager.currentPlayer.username = username;
         //         Debug.Log($"Username set to: {username}");
         //     }
         // }
@@ -85,11 +87,11 @@ public class PlayerManager : MonoBehaviour
     private void OnPlayerLogin(object sender, PlayerEventArgs e)
     {
         string response = e.Response;
-        CurrentPlayer = CreatePlayerFromResponse(response);
+        currentPlayer = CreatePlayerFromResponse(response);
 
         ShowAllPlayers();
 
-        Debug.Log($"Player initialized: {CurrentPlayer.username}");
+        Debug.Log($"Player initialized: {currentPlayer.username}");
 
     }
 
@@ -126,14 +128,14 @@ public class PlayerManager : MonoBehaviour
 
     public void Logout()
     {
-        StartCoroutine(PerformLogout(CurrentPlayer.sessionId));
+        StartCoroutine(PerformLogout(currentPlayer.sessionId));
     }
 
     private IEnumerator PerformLogout(string sessionId)
     {
         WWWForm form = new WWWForm();
         form.AddField("sessionId", sessionId);
-        form.AddField("currentUsername", CurrentPlayer.username);
+        form.AddField("currentUsername", currentPlayer.username);
 
         yield return NetworkManager.Instance.PostRequest(
             logoutUrl,
@@ -143,7 +145,7 @@ public class PlayerManager : MonoBehaviour
                 NetworkManager.Instance.CloseWebSocket();
                 PlayerPrefs.DeleteKey("Username");
                 HideAllPlayers();
-                CurrentPlayer = null;
+                currentPlayer = null;
                 SceneManager.LoadScene("LoginScene");
             },
             onError: (error) =>
@@ -168,7 +170,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (playerParent == null)
         {
-            playerParent = GameObject.Find("PlayerParent").transform;
+            playerParent = GameObject.Find("GameObject").transform;
         }
 
         foreach (Transform child in playerParent)
@@ -182,7 +184,7 @@ public class PlayerManager : MonoBehaviour
     private IEnumerator OnlinePlayers()
     {
         WWWForm form = new WWWForm();
-        form.AddField("currentUsername", CurrentPlayer.username);
+        form.AddField("currentUsername", currentPlayer.username);
 
         yield return NetworkManager.Instance.PostRequest(
             onlinePlayersUrl,
@@ -205,7 +207,7 @@ public class PlayerManager : MonoBehaviour
     {
         foreach (PlayerData player in players)
         {
-            if (!otherPlayers.ContainsKey(player.username))
+            if (!onlinePlayers.ContainsKey(player.username))
             {
                 // 新玩家：创建游戏对象
                 GameObject playerObject = Instantiate(playerPrefab, playerParent);
@@ -213,8 +215,8 @@ public class PlayerManager : MonoBehaviour
                 // 添加血条
                 var healthBar = playerObject.AddComponent<HealthBar>();
                 healthBar.healthBarPrefab = healthBarPrefab;
-                healthBar.uiParent = uiParent;
-                healthBar.mainCamera = mainCamera;
+                // healthBar.uiParent = uiParent;
+                // healthBar.mainCamera = mainCamera;
                 healthBar.Initialize(playerObject.transform, player.username, 100);
 
                 playerObject.name = player.username;
@@ -222,31 +224,29 @@ public class PlayerManager : MonoBehaviour
 
                 // playerObject.GetComponent<BoxCollider2D>().isTrigger = true;
                 playerObject.GetComponent<Collider2D>().tag = "Enemy";
-                otherPlayers[player.username] = playerObject;
+                onlinePlayers[player.username] = playerObject;
                 Debug.Log("Added new player " + player.username);
 
-                // 订阅 PlayerSync 事件
-                EventManager.Subscribe<PlayerProto>("PlayerSync", playerProtoData =>
-                {
-                    OnPlayerSync(playerProtoData);
-                });
             }
             else
             {
                 // 添加血条
-                var healthBar = otherPlayers[player.username].AddComponent<HealthBar>();
+                var healthBar = onlinePlayers[player.username].AddComponent<HealthBar>();
                 healthBar.healthBarPrefab = healthBarPrefab;
-                healthBar.uiParent = uiParent;
-                healthBar.mainCamera = mainCamera;
+                // healthBar.uiParent = uiParent;
+                // healthBar.mainCamera = mainCamera;
 
-                healthBar.Initialize(otherPlayers[player.username].transform, player.username, 100);
+                healthBar.Initialize(onlinePlayers[player.username].transform, player.username, 100);
 
-                otherPlayers[player.username].name = player.username;
+                onlinePlayers[player.username].name = player.username;
                 // 更新位置
-                otherPlayers[player.username].transform.position = new Vector3(player.position.x, player.position.y, 0);
+                onlinePlayers[player.username].transform.position = new Vector3(player.position.x, player.position.y, 0);
                 Debug.Log("Existed player " + player.username);
             }
         }
+
+        pc.InitializeHealthBar();
+
     }
 
     public void OnPlayerSync(PlayerProto syncProto)
@@ -257,22 +257,20 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
-        if (syncProto.Username == CurrentPlayer.username)
+        if (syncProto.Username == currentPlayer.username)
         {
             // 当前玩家的同步逻辑交给 PlayerController 处理
-            // var pc = CurrentPlayer.GetComponent<PlayerController>();
-            // if (pc != null)
-            // {
-            //     pc.UpdateCurrentPlayer(syncProto);
-            // }
+            if (pc != null)
+            {
+                pc.UpdateCurrentPlayer(syncProto);
+            }
         }
         else
         {
             // 其他玩家的同步逻辑
             string usernameKey = syncProto.Username.Trim().ToLower();
-            if (otherPlayers.TryGetValue(usernameKey, out GameObject playerObject))
+            if (onlinePlayers.TryGetValue(usernameKey, out GameObject playerObject))
             {
-                var pc = playerObject.GetComponent<PlayerController>();
                 if (pc != null)
                 {
                     pc.UpdateOtherPlayer(syncProto);
@@ -309,6 +307,11 @@ public class PlayerManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void TestClick()
+    {
+
     }
 
 }

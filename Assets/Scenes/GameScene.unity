@@ -56723,7 +56723,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 159948855}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1229021732}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnAction
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &159948855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61606,7 +61618,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7621712199932388234, guid: 50081d13a921568469b87c8984d62155, type: 3}
   m_PrefabInstance: {fileID: 4226866710980693793}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 4226866710980693794}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ffa4a3e87832f549b309db4502394aa, type: 3}
@@ -73333,6 +73345,7 @@ MonoBehaviour:
   mainCamera: {fileID: 519420031}
   playerPrefab: {fileID: 954462153327164497, guid: 50081d13a921568469b87c8984d62155, type: 3}
   playerParent: {fileID: 1990175064}
+  pc: {fileID: 1229021732}
 --- !u!1 &2022067215
 GameObject:
   m_ObjectHideFlags: 0
@@ -74059,8 +74072,32 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 954462153327164497, guid: 50081d13a921568469b87c8984d62155, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4226866710980693795}
   m_SourcePrefab: {fileID: 100100000, guid: 50081d13a921568469b87c8984d62155, type: 3}
+--- !u!1 &4226866710980693794 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 954462153327164497, guid: 50081d13a921568469b87c8984d62155, type: 3}
+  m_PrefabInstance: {fileID: 4226866710980693793}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4226866710980693795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4226866710980693794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12d36154f7df3984b896b0660e21eedf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBarPrefab: {fileID: 3848586537479946052, guid: 4613d47e01410654ea6c7e388939cdc8, type: 3}
+  uiParent: {fileID: 0}
+  mainCamera: {fileID: 0}
+  controller: {fileID: 0}
 --- !u!1001 &4387996441545317035
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -77,21 +77,8 @@ public class NetworkManager : MonoBehaviour
                 HandleMessage(buffer, result.Count);
             }
         }
+        Debug.Log("消息接收已停止");
     }
-
-    // private void HandleMessage(byte[] buffer, int count)
-    // {
-    //     var playersState = PlayersState.Parser.ParseFrom(buffer, 0, count);
-    //     foreach (var player in playersState.Players)
-    //     {
-    //         if (player.Username != PlayerManager.CurrentPlayer.username)
-    //         {
-    //             Debug.Log($"Received player sync: {player.Username}, Position: ({player.X}, {player.Y})");
-
-    //             EventManager.Invoke("PlayerSync", player);
-    //         }
-    //     }
-    // }
 
     private void HandleMessage(byte[] buffer, int count)
     {
@@ -105,7 +92,7 @@ public class NetworkManager : MonoBehaviour
                 var playerStateUpdate = PlayerStateUpdate.Parser.ParseFrom(baseMessage.Payload);
                 var player = playerStateUpdate.Player;
 
-                if (player.Username != PlayerManager.CurrentPlayer.username)
+                if (player.Username != PlayerManager.currentPlayer.username)
                 {
                     Debug.Log($"Received player sync: {player.Username}, Position: ({player.X}, {player.Y})");
                     EventManager.Invoke("PlayerSync", player);
@@ -151,31 +138,6 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    public void SendPlayerUpdate(PlayerStateUpdate update)
-    {
-        if (ws != null && ws.State == WebSocketState.Open)
-        {
-            // Debug.Log("Sending player update: " + update.Player.Username);
-            byte[] buffer = update.ToByteArray();
-            ws.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Binary, true, cancellationToken.Token)
-              .ContinueWith(task =>
-              {
-                  if (task.IsFaulted)
-                  {
-                      Debug.LogError("Failed to send message: " + task.Exception.Message);
-                  }
-                  else
-                  {
-                      //   Debug.Log("Message sent successfully.");
-                  }
-              });
-        }
-        else
-        {
-            Debug.LogError("WebSocket is not open. State: " + ws?.State);
-        }
-    }
-
     public void SendItemPickup(string itemId)
     {
         ItemProto itemProto = new ItemProto { Id = itemId };
@@ -187,7 +149,7 @@ public class NetworkManager : MonoBehaviour
     {
         ChatMessage chatMessage = new ChatMessage
         {
-            Sender = PlayerManager.CurrentPlayer.username,
+            Sender = PlayerManager.currentPlayer.username,
             Receiver = receiver,
             Content = content,
             Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()

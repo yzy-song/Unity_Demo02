@@ -13,8 +13,25 @@ public class HealthBar : MonoBehaviour
 
     // private Transform playerTransform;    // 玩家对象的 Transform
     public PlayerController controller;
+    private void Awake()
+    {
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main; // 动态获取主摄像机
+            if (mainCamera == null)
+            {
+                Debug.LogWarning("MainCamera not found for HealthBar.");
+                return;
+            }
+        }
+        if (uiParent == null)
+        {
+            uiParent = GameObject.Find("UIParent").transform;
+        }
+    }
     public void Initialize(Transform player, string playerName, float maxHealth)
     {
+        Debug.Log("HealthBar Initialize");
         controller = player.GetComponent<PlayerController>();
 
         // EventManager.Subscribe("HealthChangedEventArgs", UpdateHealthBar);
@@ -38,15 +55,6 @@ public class HealthBar : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (mainCamera == null)
-        {
-            mainCamera = Camera.main; // 动态获取主摄像机
-            if (mainCamera == null)
-            {
-                Debug.LogWarning("MainCamera not found for HealthBar.");
-                return;
-            }
-        }
         if (controller && healthBarInstance)
         {
             // 将血条位置同步到玩家头顶

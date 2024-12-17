@@ -13,6 +13,7 @@ public static class EventManager
             eventDictionary[eventName] = null;
         }
         eventDictionary[eventName] = (Action<T>)eventDictionary[eventName] + listener;
+        Debug.Log("Subscribed to " + eventName);
     }
 
     public static void Unsubscribe<T>(string eventName, Action<T> listener)
@@ -23,6 +24,7 @@ public static class EventManager
             if (eventDictionary[eventName] == null)
             {
                 eventDictionary.Remove(eventName);
+                Debug.Log("Unsubscribed to " + eventName);
             }
         }
     }
