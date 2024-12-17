@@ -131,11 +131,10 @@ public class PlayerController : MonoBehaviour
             BaseMessage baseMessage = new BaseMessage
             {
                 EventType = "PlayerStateUpdate", // 事件类型
-                Payload = Google.Protobuf.ByteString.CopyFrom(update.ToByteArray()) // 序列化 PlayerStateUpdate
+                Payload = ByteString.CopyFrom(update.ToByteArray()) // 序列化 PlayerStateUpdate
             };
 
             // 发送状态到服务器
-            byte[] buffer = baseMessage.ToByteArray();
             NetworkManager.Instance.SendBaseMessage(baseMessage);
 
             // 更新最后的位置

@@ -98,8 +98,6 @@ public class NetworkManager : MonoBehaviour
         // 解析 BaseMessage
         var baseMessage = BaseMessage.Parser.ParseFrom(buffer, 0, count);
 
-        Debug.Log($"Event Type: {baseMessage.EventType}");
-        Debug.Log($"Payload length: {baseMessage.Payload.Length}");
         // 根据事件类型解析不同的消息内容
         switch (baseMessage.EventType)
         {
