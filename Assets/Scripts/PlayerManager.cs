@@ -19,7 +19,7 @@ public class PlayerManager : MonoBehaviour
     public Transform playerParent;
     public PlayerController pc;
     public static Player currentPlayer { get; private set; }
-    public Dictionary<string, GameObject> onlinePlayers = new Dictionary<string, GameObject>();
+    public Dictionary<string, PlayerController> onlinePlayers = new Dictionary<string, PlayerController>();
     private Dictionary<string, GameObject> items = new Dictionary<string, GameObject>();
 
     public static PlayerManager Instance { get; private set; }
@@ -238,14 +238,14 @@ public class PlayerManager : MonoBehaviour
 
                 // playerObject.GetComponent<BoxCollider2D>().isTrigger = true;
                 playerObject.GetComponent<Collider2D>().tag = "Enemy";
-                onlinePlayers[player.username] = playerObject;
+                onlinePlayers[player.username] = playerObject.GetComponent<PlayerController>();
                 Debug.Log("Added new player " + player.username);
 
             }
             else
             {
                 // 添加血条
-                var healthBar = onlinePlayers[player.username].AddComponent<HealthBar>();
+                var healthBar = onlinePlayers[player.username].gameObject.AddComponent<HealthBar>();
                 healthBar.healthBarPrefab = healthBarPrefab;
                 // healthBar.uiParent = uiParent;
                 // healthBar.mainCamera = mainCamera;
@@ -284,10 +284,9 @@ public class PlayerManager : MonoBehaviour
         {
             // 其他玩家的同步逻辑
             string usernameKey = syncProto.Username.Trim().ToLower();
-            if (onlinePlayers.TryGetValue(usernameKey, out GameObject playerObject))
+            if (onlinePlayers.TryGetValue(usernameKey, out PlayerController pc))
             {
-                var ptherPC = playerObject.GetComponent<PlayerController>();
-                ptherPC?.UpdateOtherPlayer(syncProto);
+                pc?.UpdateOtherPlayer(syncProto);
             }
             else
             {

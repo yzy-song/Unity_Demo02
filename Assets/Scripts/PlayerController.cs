@@ -104,7 +104,7 @@ public class PlayerController : MonoBehaviour
         // 根据移动状态决定同步间隔
         float interval = isMoving ? highFrequencyInterval : lowFrequencyInterval;
 
-        if (Time.time - lastSyncTime >= interval)
+        if (gameObject.name == "Player" && Time.time - lastSyncTime >= interval)
         {
             lastSyncTime = Time.time;
 
@@ -122,7 +122,7 @@ public class PlayerController : MonoBehaviour
                 }
             };
 
-            Debug.Log($"Updated Player Status: name={player.username}, x={transform.position.x}, y={transform.position.x}");
+            // Debug.Log($"Updated Player Status: name={player.username}, x={transform.position.x}, y={transform.position.x}");
 
             BaseMessage baseMessage = new BaseMessage
             {

@@ -91,12 +91,8 @@ public class NetworkManager : MonoBehaviour
             case "PlayerStateUpdate":
                 var playerStateUpdate = PlayerStateUpdate.Parser.ParseFrom(baseMessage.Payload);
                 var player = playerStateUpdate.Player;
-
-                if (player.Username != PlayerManager.currentPlayer.username)
-                {
-                    Debug.Log($"Received player sync: {player.Username}, Position: ({player.X}, {player.Y})");
-                    EventManager.Invoke("PlayerSync", player);
-                }
+                Debug.Log($"Received player sync: {player.Username}, Position: ({player.X}, {player.Y})");
+                EventManager.Invoke("PlayerSync", player);
                 break;
 
             case "ItemPickup":
