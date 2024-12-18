@@ -57357,7 +57357,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 520098104}
-  - component: {fileID: 520098105}
   m_Layer: 5
   m_Name: DragTest
   m_TagString: Untagged
@@ -57386,18 +57385,6 @@ RectTransform:
   m_AnchoredPosition: {x: 10.5, y: 373}
   m_SizeDelta: {x: 704.1447, y: 178.14862}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &520098105
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 520098103}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdab47a2becea5f48832ca96f262f5ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &573110866
 GameObject:
   m_ObjectHideFlags: 0
@@ -57899,7 +57886,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 520098105}
+        - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: DragTest, Assembly-CSharp
           m_MethodName: BeginDrag
           m_Mode: 2
@@ -57915,7 +57902,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 520098105}
+        - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: DragTest, Assembly-CSharp
           m_MethodName: OnDrag
           m_Mode: 2
@@ -57931,7 +57918,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 520098105}
+        - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: DragTest, Assembly-CSharp
           m_MethodName: EndDrag
           m_Mode: 2
@@ -57947,7 +57934,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 520098105}
+        - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: DragTest, Assembly-CSharp
           m_MethodName: OnDrop
           m_Mode: 2
@@ -73643,7 +73630,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 520098105}
+        - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: DragTest, Assembly-CSharp
           m_MethodName: BeginDrag
           m_Mode: 2
@@ -73659,7 +73646,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 520098105}
+        - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: DragTest, Assembly-CSharp
           m_MethodName: OnDrag
           m_Mode: 2
@@ -73675,7 +73662,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 520098105}
+        - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: DragTest, Assembly-CSharp
           m_MethodName: EndDrag
           m_Mode: 2
@@ -73691,7 +73678,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 520098105}
+        - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: DragTest, Assembly-CSharp
           m_MethodName: OnDrop
           m_Mode: 2
@@ -74097,7 +74084,7 @@ MonoBehaviour:
   healthBarPrefab: {fileID: 3848586537479946052, guid: 4613d47e01410654ea6c7e388939cdc8, type: 3}
   uiParent: {fileID: 0}
   mainCamera: {fileID: 0}
-  controller: {fileID: 0}
+  controller: {fileID: 1229021732}
 --- !u!1001 &4387996441545317035
 PrefabInstance:
   m_ObjectHideFlags: 0

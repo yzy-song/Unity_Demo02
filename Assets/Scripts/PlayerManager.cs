@@ -37,12 +37,12 @@ public class PlayerManager : MonoBehaviour
     private void Start()
     {
         Application.runInBackground = true;
-        // 登录成功后获取其他在线玩家数据
-        StartCoroutine(OnlinePlayers());
+        // // 登录成功后获取其他在线玩家数据
+        // StartCoroutine(OnlinePlayers());
 
         EventManager.Subscribe<ItemProto>("ItemPickup", HandleItemPickup);
         EventManager.Subscribe<ChatMessage>("ChatMessage", DisplayChatMessage);
-        EventManager.Subscribe<PlayerProto>("PlayerSync", OnPlayerSync);
+
         // string[] args = Environment.GetCommandLineArgs();
         // foreach (var arg in args)
         // {
@@ -76,23 +76,37 @@ public class PlayerManager : MonoBehaviour
 
     private void OnEnable()
     {
-        LoginManager.OnPlayerLogin += OnPlayerLogin;
+        EventManager.Subscribe<string>("LoginSuccess", InitializePlayer);
+        EventManager.Subscribe<PlayerProto>("PlayerSync", OnPlayerSync);
+        EventManager.Subscribe<ItemProto>("ItemPickup", HandleItemPickup);
+        EventManager.Subscribe<ChatMessage>("ChatMessage", DisplayChatMessage);
     }
 
     private void OnDisable()
     {
-        LoginManager.OnPlayerLogin -= OnPlayerLogin;
+        EventManager.Unsubscribe<string>("LoginSuccess", InitializePlayer);
+        EventManager.Unsubscribe<PlayerProto>("PlayerSync", OnPlayerSync);
+        EventManager.Unsubscribe<ItemProto>("ItemPickup", HandleItemPickup);
+        EventManager.Unsubscribe<ChatMessage>("ChatMessage", DisplayChatMessage);
     }
 
-    private void OnPlayerLogin(object sender, PlayerEventArgs e)
+    private void InitializePlayer(string response)
     {
-        string response = e.Response;
+        Debug.Log("Initializing current player...");
         currentPlayer = CreatePlayerFromResponse(response);
+        Debug.Log($"Player {currentPlayer.username} initialized.");
 
-        ShowAllPlayers();
+        if (playerParent == null)
+        {
+            playerParent = GameObject.Find("GameObject").transform;
+        }
 
-        Debug.Log($"Player initialized: {currentPlayer.username}");
-
+        foreach (Transform child in playerParent)
+        {
+            child.gameObject.SetActive(true); // 启用子节点
+        }
+        // 获取在线玩家
+        StartCoroutine(OnlinePlayers());
     }
 
     private Player CreatePlayerFromResponse(string response)
@@ -246,6 +260,7 @@ public class PlayerManager : MonoBehaviour
         }
 
         pc.InitializeHealthBar();
+
 
     }
 

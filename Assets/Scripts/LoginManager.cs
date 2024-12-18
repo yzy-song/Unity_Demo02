@@ -15,7 +15,6 @@ public class LoginManager : MonoBehaviour
     public Text txtTips;
 
     public LoadingManager loadingManager; // 引用 LoadingManager
-    public static event EventHandler<PlayerEventArgs> OnPlayerLogin;
     private string loginUrl = "http://localhost:5000/api/auth/login";
     private string guestLoginUrl = "http://localhost:5000/api/auth/guest";
     private static string tempResponse;
@@ -63,6 +62,12 @@ public class LoginManager : MonoBehaviour
         StartCoroutine(PerformGuestLogin());
     }
 
+    public void OnLoginSuccess(string response)
+    {
+        Debug.Log("Login successful!");
+        EventManager.Invoke("LoginSuccess", response);
+    }
+
     private IEnumerator PerformLogin(string username, string password)
     {
         WWWForm form = new WWWForm();
@@ -79,6 +84,7 @@ public class LoginManager : MonoBehaviour
                 if (response.Contains("success"))
                 {
                     tempResponse = response;
+
                     SceneManager.sceneLoaded += OnGameSceneLoaded;
                     SceneManager.LoadScene("GameScene");
                     NetworkManager.Instance.ConnectWebSocket();
@@ -115,6 +121,7 @@ public class LoginManager : MonoBehaviour
                     SceneManager.sceneLoaded += OnGameSceneLoaded;
                     SceneManager.LoadScene("GameScene");
                     NetworkManager.Instance.ConnectWebSocket();
+                    EventManager.Invoke("LoginSuccess", response);
                 }
                 else
                 {
@@ -139,7 +146,7 @@ public class LoginManager : MonoBehaviour
     {
         if (scene.name == "GameScene")
         {
-            OnPlayerLogin?.Invoke(this, new PlayerEventArgs(tempResponse));
+            EventManager.Invoke("LoginSuccess", tempResponse);
             tempResponse = null;
             SceneManager.sceneLoaded -= OnGameSceneLoaded;
         }
