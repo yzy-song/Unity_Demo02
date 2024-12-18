@@ -271,15 +271,8 @@ public class PlayerManager : MonoBehaviour
             string usernameKey = syncProto.Username.Trim().ToLower();
             if (onlinePlayers.TryGetValue(usernameKey, out GameObject playerObject))
             {
-                if (pc != null)
-                {
-                    pc.UpdateOtherPlayer(syncProto);
-                    Debug.Log("Updated player " + usernameKey);
-                }
-                else
-                {
-                    Debug.Log("PlayerController not found for username: " + usernameKey);
-                }
+                var ptherPC = playerObject.GetComponent<PlayerController>();
+                ptherPC?.UpdateOtherPlayer(syncProto);
             }
             else
             {
